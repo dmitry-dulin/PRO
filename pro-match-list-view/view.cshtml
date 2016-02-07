@@ -1,0 +1,102 @@
+@model IViewElementContext
+@{
+    ViewBag.ShowNowViewing = true;
+    ViewBag.ShowNowViewingSubEntities = true;
+}
+<link rel="stylesheet" type="text/css" href="@View.ResourceUrl("match-list.css")" />
+
+<div id="match-list">
+    <!--section header starts-->
+    <div class="section-header section-header--separated clear-fix">
+        <div class="section-header__col">
+            <span class="section-header__label" data-bind="text: acceptedCount"></span>
+            <strong class="section-header__title">
+                <span class="section-header__title-item">Accepted</span>
+            </strong>
+        </div>
+        <div class="section-header__col">
+            <span class="section-header__label section-header__label--left" data-bind="text: pendingCount"></span>
+            <strong class="section-header__title">
+                <span class="section-header__title-item">Pending</span>
+            </strong>
+        </div>
+    </div>
+    <!--section header ends-->
+
+
+    <div class="hidden" data-bind="visible: matchListCount() > 0, css: { 'hidden': matchListCount() < 1 }">
+        <!-- ko foreach: matchList() -->
+        <div class="match-item">
+            <strong class="match-item__note"><span data-bind="text: moment(date).fromNow()"></span></strong>
+            <div class="match-item__info" data-bind="css:{ 'match-item__info--red': accepted() == false, 'match-item__info--green': accepted() == true }">
+                <!-- ko if: homeTeamLogo -->
+                <div class="match-item__team-logo">
+                    <img data-bind="attr:{src: homeTeamLogo}" class="match-item__team-logo-img" alt="">
+                </div>
+                <!-- /ko -->
+                <!-- ko if: homeTeamLogo -->
+                <div class="match-item__team-logo match-item__team-logo--right">
+                    <img data-bind="attr:{src: awayTeamLogo}" class="match-item__team-logo-img" alt="">
+                </div>
+                <!-- /ko -->
+                <div class="match-item__info-top">
+                    <strong class="match-item__team-name" data-bind="text: homeTeam"></strong>
+                    <span class="match-item__info-center">vs</span>
+                    <strong class="match-item__team-name match-item__team-name--right" data-bind="text: awayTeam"></strong>
+                </div>
+                <div class="match-item__info-bottom">
+                    <strong class="match-item__type" data-bind="text: matchType"></strong>
+                    <strong class="match-item__date" data-bind="text: moment(date).format('dddd, MMMM Do YYYY, h:mm:ss a')"></strong>
+                    <strong class="match-item__location" data-bind="text: venue"></strong>
+                </div>
+            </div>
+            <!-- ko if: gameData.length -->
+            <div class="match-item__table-holder">
+                <div class="match-item__table-slide">
+                    <table class="match-item__table">
+                        <thead>
+                            <tr>
+                                <td class="match-item__table-cell match-item__table-cell-header">Referee position</td>
+                                @*<td class="match-item__table-cell match-item__table-cell-header">Status</td>*@
+                                <td class="match-item__table-cell match-item__table-cell-header">Name</td>
+                                <td class="match-item__table-cell match-item__table-cell-header">Accept</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- ko foreach: gameData -->
+                            <tr>
+                                <td class="match-item__table-cell" data-bind="text: refereePosition"></td>
+                                @*<td class="match-item__table-cell match-item__table-cell--green" data-bind="text: status, css: {'': !statusColor, 'match-item__table-cell--red':statusColor=='red', 'match-item__table-cell--green':statusColor=='green'}"></td>*@
+                                <td class="match-item__table-cell" data-bind="text: name"></td>
+                                <td class="match-item__table-cell" data-bind="text: accept"></td>
+                            </tr>
+                            <!-- /ko -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- /ko -->
+            <div class="match-item__btn-holder">
+                <dl class="match-item_suggestion-list">
+                    <dt class="match-item_suggestion-term">Position:</dt>
+                    <dd class="match-item_suggestion-description" data-bind="text: suggestionPosition"></dd>
+                </dl>
+                <!-- ko if: accepted() == null && $parent.currentUserId() && futureMatch -->
+                <button href="#" class="btn btn-success" data-bind="click: $parent.setAccept">Accept</button>
+                <button href="#" class="btn btn-danger" data-bind="click: $parent.setReject">Reject</button>
+                <!-- /ko -->
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+
+    <strong data-bind="visible: matchListCount() == 0">No data.</strong>
+</div>
+
+@using (Html.Scripts())
+{
+    <script src="@View.ResourceUrl("loader.js")"></script>
+    <script src="@View.ResourceUrl("arrayLogo.min.js")"></script>
+    <script src="@View.ResourceUrl("dataManager.min.js")"></script>
+    <script src="@View.ResourceUrl("matchListViewModel.min.js")"></script>
+}

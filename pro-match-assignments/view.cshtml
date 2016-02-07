@@ -1,0 +1,166 @@
+@model IViewElementContext
+@{
+    ViewBag.ShowNowViewing = true;
+    ViewBag.ShowNowViewingSubEntities = true;
+}
+
+<link rel="stylesheet" type="text/css" href="@View.ResourceUrl("jquery.mCustomScrollbar.min.css")" />
+<link rel="stylesheet" type="text/css" href="@View.ResourceUrl("panel.css")" />
+<link rel="stylesheet" type="text/css" href="@View.ResourceUrl("match-assignments.css")" />
+
+<div class="wrapper">
+    <div id="match-info">
+        <div class="header">
+            <div class="header__team">
+                <div class="header__team-logo">
+                    <img data-bind="attr: {src:teamOneImg}" alt="Logo1" />
+                </div>
+                <div class="header__team-text" data-bind="text:teamOne">Loading...</div>
+            </div>
+            <div class="header__team header__team_content">
+                <div class="header__team-vs">vs</div>
+                <div class="header__team-text" data-bind="text:teamTwo">Loading...</div>
+                <div class="header__team-logo">
+                    <img data-bind="attr: {src:teamTwoImg}" alt="Logo2" />
+                </div>
+            </div>
+        </div>
+
+        <div class="info">
+            <ul class="info__list">
+                <li class="info__item"><span>Location:</span><strong data-bind="text:matchLocation">Loading...</strong></li>
+                <li class="info__item"><span>Date:</span><strong data-bind="text:matchDate">Loading...</strong></li>
+                <li class="info__item"><span>Match Type:</span><strong data-bind="text:matchType">Loading...</strong></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="referee-list" class="field">
+        <ul class="field__list">
+            <li class="field__item">
+                <span>Referee:</span>
+                <div class="referee-list__wrapper">
+                    @*disabled*@
+                    <a class="dropdown-toggle-a drop-refereeFullTime" data-toggle="dropdown" href="#">
+                        <div class="menu-icon">
+                            <i data-font-icon="subject"></i>
+                        </div>
+                        <span class="username" data-bind="text: $root.selectedRefereeFullTime().name">Loading...</span>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="c-scroll dropdown-menu" role="menu" aria-labelledby="dRefereeLabel" data-bind="dropDownScroll:{}">
+                        <ul data-bind="template: { name: 'selectRefereeTemplate', foreach: refereeListMLS}"></ul>
+                    </div>
+                </div>
+            </li>
+            <li class="field__item">
+                <span>Assisstant Referee 1:</span>
+                <div class="referee-list__wrapper">
+                    <a class="dropdown-toggle-a drop-refereeAssistant" data-toggle="dropdown" href="#">
+                        <div class="menu-icon">
+                            <i data-font-icon="subject"></i>
+                        </div>
+                        <span class="username" data-bind="text: $root.selectedRefereeAssistant().name">Loading...</span>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="c-scroll dropdown-menu" role="menu" aria-labelledby="dRefereeLabel" data-bind="dropDownScroll:{}">
+                        <ul data-bind="template: { name: 'selectRefereeTemplateTwo', foreach: refereeListMLS}"></ul>
+                    </div>
+                </div>
+            </li>
+            <li class="field__item">
+                <span>Assisstant Referee 2:</span>
+                <div class="referee-list__wrapper">
+                    <a class="dropdown-toggle-a drop-refereeAssistantTwo" data-toggle="dropdown" href="#">
+                        <div class="menu-icon">
+                            <i data-font-icon="subject"></i>
+                        </div>
+                        <span class="username" data-bind="text: $root.selectedRefereeAssistantTwo().name">Loading...</span>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="c-scroll dropdown-menu" role="menu" aria-labelledby="dRefereeLabel" data-bind="dropDownScroll:{}">
+                        <ul data-bind="template: { name: 'selectRefereeTemplateAssistantTwo', foreach: refereeListMLS}"></ul>
+                    </div>
+                </div>
+            </li>
+            <li class="field__item">
+                <span>4th Official:</span>
+                <div class="referee-list__wrapper">
+                    <a class="dropdown-toggle-a drop-refereeFourth" data-toggle="dropdown" href="#">
+                        <div class="menu-icon">
+                            <i data-font-icon="subject"></i>
+                        </div>
+                        <span class="username" data-bind="text: $root.selectedRefereeFourth().name">Loading...</span>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="c-scroll dropdown-menu" role="menu" aria-labelledby="dRefereeLabel" data-bind="dropDownScroll:{}">
+                        <ul data-bind="template: { name: 'selectRefereeTemplateThree', foreach: refereeListMLS}"></ul>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <div class="control">
+            <button class="btn btn-success control__link" data-bind="click: saveReferee">Save</button>
+            <button class="btn btn-danger control__link" data-bind="click: backHome">Back</button>
+        </div>
+    </div>
+
+</div>
+
+@using (Html.Scripts())
+{
+    <script>
+        var locationSearch = location.search;
+    </script>
+    <script src="@View.ResourceUrl("jquery.mCustomScrollbar.js")"></script>
+    <script src="@View.ResourceUrl("jquery.mousewheel-3.0.6.js")"></script>
+    <script src="@View.ResourceUrl("loader.js")"></script>
+    <script src="@View.ResourceUrl("dataManager.min.js")"></script>
+    <script src="@View.ResourceUrl("matchViewModel.min.js")"></script>
+    <script src="@View.ResourceUrl("refereeListViewModel.min.js")"></script>
+    
+
+    <script id="selectRefereeTemplate" type="text/html">
+        <li data-bind="css: {'active': name == $root.selectedRefereeFullTime().name}, style: { backgroundColor: color }">
+            <a class="referee-link-select" data-bind="click: disabled() ? $root.stopPropagationLink : $root.refereeChangedFullTime.bind($data, id, name, score, violations, color),css: {'disabled-link': disabled()}">
+                <span class="referee-name" data-bind="text: name"></span>
+                <span class="referee-score" data-bind="text: score"></span>
+                <span class="referee-violations" data-bind="text: violations || ''"></span>
+                <i data-bind="visible: violations" data-font-icon="warning-triangle"></i>
+            </a>
+        </li>
+    </script>
+
+    <script id="selectRefereeTemplateTwo" type="text/html">
+        <li data-bind="css: {'active': name == $root.selectedRefereeAssistant().name}, style: { backgroundColor: color }">
+            <a class="referee-link-select" data-bind="click: disabled() ? $root.stopPropagationLink : $root.refereeChangedAssistant.bind($data, id, name, score, violations, color),css: {'disabled-link': disabled()}">
+                <span class="referee-name" data-bind="text: name"></span>
+                <span class="referee-score" data-bind="text: score"></span>
+                <span class="referee-violations" data-bind="text: violations || ''"></span>
+                <i data-bind="visible: violations" data-font-icon="warning-triangle"></i>
+            </a>
+        </li>
+    </script>
+
+    <script id="selectRefereeTemplateAssistantTwo" type="text/html">
+        <li data-bind="css: {'active': name == $root.selectedRefereeAssistantTwo().name}, style: { backgroundColor: color }">
+            <a class="referee-link-select" data-bind="click: disabled() ? $root.stopPropagationLink : $root.refereeChangedAssistantTwo.bind($data, id, name, score, violations, color),css: {'disabled-link': disabled()}">
+                <span class="referee-name" data-bind="text: name"></span>
+                <span class="referee-score" data-bind="text: score"></span>
+                <span class="referee-violations" data-bind="text: violations || ''"></span>
+                <i data-bind="visible: violations" data-font-icon="warning-triangle"></i>
+            </a>
+        </li>
+    </script>
+
+    <script id="selectRefereeTemplateThree" type="text/html">
+        <li data-bind="css: {'active': name == $root.selectedRefereeFourth().name}, style: { backgroundColor: color }">
+            <a class="referee-link-select" data-bind="click: disabled() ? $root.stopPropagationLink : $root.refereeChangedFourth.bind($data, id, name, score, violations, color),css: {'disabled-link': disabled()}">
+                <span class="referee-name" data-bind="text: name"></span>
+                <span class="referee-score" data-bind="text: score"></span>
+                <span class="referee-violations" data-bind="text: violations || ''"></span>
+                <i data-bind="visible: violations" data-font-icon="warning-triangle"></i>
+            </a>
+        </li>
+    </script>
+}

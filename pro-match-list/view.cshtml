@@ -1,0 +1,277 @@
+@model IViewElementContext
+@{
+    ViewBag.ShowNowViewing = true;
+    ViewBag.ShowNowViewingSubEntities = true;
+}
+<link rel="stylesheet" type="text/css" href="@View.ResourceUrl("jquery.mCustomScrollbar.min.css")" />
+<link rel="stylesheet" type="text/css" href="@View.ResourceUrl("match-list.css")" />
+<link rel="stylesheet" type="text/css" href="@View.ResourceUrl("panel.css")" />
+
+
+<!-- THIS CODE NEED TO CREATE MATCH  -->
+<div class="section-match-create" id="match-create">
+    <div class="validation-info hidden" data-bind="text: validationText, css: { 'hidden': validationText().length == 0 }"></div>
+    <div class="centered">
+        <a href="#" class="btn createMatch-btn" data-bind="click: onCreateBtnClick, css: { 'hidden': popupOpened() == true }">Create new match</a>
+    </div>
+
+    <div class="create-container hidden" data-bind="css: { 'hidden': popupOpened() == false }">
+        <div class="match-item">
+            <div class="match-item__info-top">
+                
+                <div class="match-item__team-name">
+                    <a class="dropdown-toggle-a long" data-toggle="dropdown" href="#">
+                        <div class="menu-icon">
+                            <i data-font-icon="group"></i>
+                        </div>
+                        <span class="username" data-bind="text: selectedTeamOne().name"></span>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="c-scroll dropdown-menu" role="menu" aria-labelledby="dTeamLabel" data-bind="dropDownScroll:{}">
+                        <ul data-bind="template: { name: 'selectTeamOneTemplate', foreach: teamsList}"></ul>
+                    </div>
+                </div>
+
+                <div class="match-item__type">
+                    <span class="menu-icon">
+                        <i data-font-icon="calendar"></i>
+                    </span>
+                    <input data-bind="datepicker: date(), datepickerOptions: {showWeek: true, showOtherMonths: true, selectOtherMonths: true, onSelect: changeDate.bind($data)}" type="text">
+                    <input data-bind="value: matchTime().value, attr: {placeholder: matchTime().placeholder}" type="text">
+                </div>
+
+                <div class="match-item__team-name">
+                    <a class="dropdown-toggle-a long" data-toggle="dropdown" href="#">
+                        <div class="menu-icon">
+                            <i data-font-icon="group"></i>
+                        </div>
+                        <span class="username" data-bind="text: selectedTeamTwo().name"></span>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="c-scroll dropdown-menu" role="menu" aria-labelledby="dTeamLabel" data-bind="dropDownScroll:{}">
+                        <ul data-bind="template: { name: 'selectTeamTwoTemplate', foreach: teamsList}"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="match-item__info-bottom">
+                <div class="match-item__type">
+                    <a class="dropdown-toggle-a" data-toggle="dropdown" href="#">
+                        <span class="menu-icon">
+                            <i data-font-icon="star"></i>
+                        </span>
+                        <span class="username" data-bind="text: selectedType().name"></span>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="c-scroll dropdown-menu" role="menu" aria-labelledby="dTeamLabel" data-bind="dropDownScroll:{}">
+                        <ul data-bind="template: { name: 'selectTypeTemplate', foreach: typesList}"></ul>
+                    </div>
+                </div>
+
+                <div class="match-item__type">
+                    <a class="dropdown-toggle-a" data-toggle="dropdown" href="#">
+                        <span class="menu-icon">
+                            <i data-font-icon="star"></i>
+                        </span>
+                        <span class="username" data-bind="text: selectedLeague().name"></span>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="c-scroll dropdown-menu" role="menu" aria-labelledby="dTeamLabel" data-bind="dropDownScroll:{}">
+                        <ul data-bind="template: { name: 'selectLeagueTemplate', foreach: leaguesList}"></ul>
+                    </div>
+                </div>
+
+                <div class="match-item__type">
+                    <a class="dropdown-toggle-a" data-toggle="dropdown" href="#">
+                        <span class="menu-icon">
+                            <i data-font-icon="subject"></i>
+                        </span>
+                        <span class="username" data-bind="text: selectedGender().name"></span>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="c-scroll dropdown-menu" role="menu" aria-labelledby="dTeamLabel" data-bind="dropDownScroll:{}">
+                        <ul data-bind="template: { name: 'selectGenderTemplate', foreach: gendersList}"></ul>
+                    </div>
+                </div>
+
+                <div class="match-item__type">
+                    <a class="dropdown-toggle-a" data-toggle="dropdown" href="#">
+                        <span class="menu-icon">
+                            <i data-font-icon="home"></i>
+                        </span>
+                        <span class="username" data-bind="text: selectedLocation().name"></span>
+                        <span class="caret"></span>
+                    </a>
+                    <div class="c-scroll dropdown-menu" role="menu" aria-labelledby="dTeamLabel" data-bind="dropDownScroll:{}">
+                        <ul data-bind="template: { name: 'selectLocationTemplate', foreach: locationList}"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="centered">
+            <a class="btn cancelMatch-btn" data-bind="click:  created() ? stopPropagationLink : cancelBtnClick, css: { 'disabled': created() == true }">Cancel</a>
+            <a class="btn createMatch-btn" data-bind="click: created() ? stopPropagationLink : createTeam, css: { 'disabled': created() == true }">Create</a>
+        </div>
+    </div>
+</div>
+
+<!-- End THIS CODE NEED TO CREATE MATCH  -->
+
+<div id="match-list">
+    <!--section header starts-->
+    <div class="section-header section-header--separated clear-fix">
+        <div class="section-header__col">
+            <span class="section-header__label" data-bind="text: unnassignedCount"></span>
+            <strong class="section-header__title">
+                <span class="section-header__title-item">Unnassigned</span>
+            </strong>
+        </div>
+        <div class="section-header__col">
+            <span class="section-header__label section-header__label--left" data-bind="text: assignedCount"></span>
+            <strong class="section-header__title">
+                <span class="section-header__title-item">Assigned</span>
+            </strong>
+        </div>
+    </div>
+    <!--section header ends-->
+
+
+    <div class="hidden" data-bind="visible: matchListCount() > 0, css: { 'hidden': matchListCount() < 1 }">
+        <!-- ko foreach: matchList() -->
+        <div class="match-item">
+            <strong class="match-item__note">
+
+                <span data-bind="text: moment(date).fromNow()"></span>
+
+            </strong>
+
+            <div class="match-item__info" data-bind="css:{'': !color, 'match-item__info--red':color=='red', 'match-item__info--green':color=='green', 'match-item__info--amber':color=='amber'}">
+                <!-- ko if: homeTeamLogo -->
+                <div class="match-item__team-logo">
+                    <img data-bind="attr:{src: homeTeamLogo}" class="match-item__team-logo-img" alt="">
+                </div>
+                <!-- /ko -->
+                <!-- ko if: homeTeamLogo -->
+                <div class="match-item__team-logo match-item__team-logo--right">
+                    <img data-bind="attr:{src: awayTeamLogo}" class="match-item__team-logo-img" alt="">
+                </div>
+                <!-- /ko -->
+                @*<a data-bind="attr: {href: !assigned ? '/view/match-assignments?viewName=match-assignments&entityId='+ $root.currentUserId() +'&entityType='+ $root.currentUserType() +'&matchId='+ id : '#'}, css:{ '': !assigned, 'disabled':assigned }" class="match-item__change-location">*@
+                <a data-bind="attr: {href: '/view/pro-match-assignments?viewName=match-assignments&entityId='+ $root.currentUserId() +'&entityType='+ $root.currentUserType() +'&matchId='+ id }" class="match-item__change-location">
+                    <div class="match-item__info-top">
+                        <strong class="match-item__team-name" data-bind="text: homeTeam"></strong>
+                        <span class="match-item__info-center">vs</span>
+                        <strong class="match-item__team-name match-item__team-name--right" data-bind="text: awayTeam"></strong>
+                    </div>
+                    <div class="match-item__info-bottom">
+                        <strong class="match-item__type" data-bind="text: matchType"></strong>
+                        <strong class="match-item__date" data-bind="text: moment(date).format('dddd, MMMM Do YYYY, h:mm:ss a')"></strong>
+                        @*<strong class="match-item__date" data-bind="text: moment(date).format('dddd, MMMM Do YYYY')"></strong>*@
+                        <strong class="match-item__location" data-bind="text: venue"></strong>
+                    </div>
+                </a>
+            </div>
+            <!-- ko if: gameData.length -->
+            <div class="match-item__table-holder">
+                <div class="match-item__table-slide" data-bind="visible: isVisibleInfo">
+                    <table class="match-item__table">
+                        <thead>
+                            <tr>
+                                <td class="match-item__table-cell match-item__table-cell-header">Referee position</td>
+                                @*<td class="match-item__table-cell match-item__table-cell-header">Status</td>*@
+                                <td class="match-item__table-cell match-item__table-cell-header">Name</td>
+                                <td class="match-item__table-cell match-item__table-cell-header">Accept</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- ko foreach: gameData -->
+                            <tr>
+                                <td class="match-item__table-cell" data-bind="text: refereePosition"></td>
+                                @*<td class="match-item__table-cell match-item__table-cell--green" data-bind="text: status, css: {'': !statusColor, 'match-item__table-cell--red':statusColor=='red', 'match-item__table-cell--green':statusColor=='green'}"></td>*@
+                                <td class="match-item__table-cell" data-bind="text: name"></td>
+                                <td class="match-item__table-cell" data-bind="text: accept"></td>
+                            </tr>
+                            <!-- /ko -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="match-item__opener-holder">
+                    <a href="#" class="match-item__opener" data-bind="click: $root.toggleTableVisible">
+                        <i class="match-item__opener-icon" data-font-icon="down-circle" data-bind="visible: !isVisibleInfo()"></i>
+                        <i class="match-item__opener-icon" data-font-icon="up-circle" data-bind="visible: isVisibleInfo()"></i>
+                        info
+                    </a>
+                </div>
+            </div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+    </div>
+
+
+
+
+
+    <strong data-bind="visible: matchListCount() == 0">No data.</strong>
+</div>
+
+@using (Html.Scripts())
+{
+    <script src="@View.ResourceUrl("jquery.mCustomScrollbar.js")"></script>
+    <script src="@View.ResourceUrl("jquery.mousewheel-3.0.6.js")"></script>
+    <script src="@View.ResourceUrl("loader.js")"></script>
+    <script src="@View.ResourceUrl("sessionManager.js")"></script>
+    <script src="@View.ResourceUrl("arrayLogo.min.js")"></script>
+    <script src="@View.ResourceUrl("dataManager.min.js")"></script>
+    <script src="@View.ResourceUrl("matchListViewModel.min.js")"></script>
+    <script src="@View.ResourceUrl("matchCreateModel.js")"></script>
+
+    <!-- THIS CODE NEED TO CREATE MATCH  -->
+    <script id="selectTeamOneTemplate" type="text/html">
+        <li data-bind="css: {'active': name == $root.selectedTeamOne().name}">
+            <a class="referee-link-select" data-bind="click: selected() ? $root.stopPropagationLink : $root.teamOneSelected.bind($data, id, name),css: {'selected-link': selected()}">
+                <span class="referee-name" data-bind="text: name"></span>
+            </a>
+        </li>
+    </script>
+
+    <script id="selectTeamTwoTemplate" type="text/html">
+        <li data-bind="css: {'active': name == $root.selectedTeamTwo().name}">
+            <a class="referee-link-select" data-bind="click: selected() ? $root.stopPropagationLink : $root.teamTwoSelected.bind($data, id, name),css: {'selected-link': selected()}">
+                <span class="referee-name" data-bind="text: name"></span>
+            </a>
+        </li>
+    </script>
+
+    <script id="selectTypeTemplate" type="text/html">
+        <li data-bind="css: {'active': name == $root.selectedType().name}">
+            <a class="referee-link-select" data-bind="click: $root.typeSelected.bind($data, id, name)">
+                <span class="referee-name" data-bind="text: name"></span>
+            </a>
+        </li>
+    </script>
+
+    <script id="selectLocationTemplate" type="text/html">
+        <li data-bind="css: {'active': name == $root.selectedLocation().name}">
+            <a class="referee-link-select" data-bind="click: $root.locationSelected.bind($data, id, name)">
+                <span class="referee-name" data-bind="text: name"></span>
+            </a>
+        </li>
+    </script>
+
+    <script id="selectGenderTemplate" type="text/html">
+        <li data-bind="css: {'active': name == $root.selectedGender().name}">
+            <a class="referee-link-select" data-bind="click: $root.genderSelected.bind($data, id, name)">
+                <span class="referee-name" data-bind="text: name"></span>
+            </a>
+        </li>
+    </script>
+
+    <script id="selectLeagueTemplate" type="text/html">
+        <li data-bind="css: {'active': name == $root.selectedLeague().name}">
+            <a class="referee-link-select" data-bind="click: $root.leagueSelected.bind($data, id, name)">
+                <span class="referee-name" data-bind="text: name"></span>
+            </a>
+        </li>
+    </script>
+    <!-- END THIS CODE NEED TO CREATE MATCH  -->
+}
